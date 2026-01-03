@@ -100,7 +100,7 @@ function AuthPage({ onLogin }) {
     e.preventDefault(); setError(''); setCargando(true);
     const endpoint = esRegistro ? '/registro' : '/login';
     try {
-      const res = await fetch(`http://localhost:5000/api/auth${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+      const res = await fetch(`https://portastudio-api.vercel.app/api/auth${endpoint}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.mensaje);
       if (esRegistro) { alert('✅ Cuenta creada. Bienvenido a PortaStudio.'); setEsRegistro(false); setFormData({ nombre: '', email: '', password: '' }); }
@@ -143,7 +143,7 @@ function VistaCliente() {
   const [nombreCliente, setNombreCliente] = useState(''); 
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/proyectos/${id}`).then(res => res.json()).then(data => { 
+    fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}`).then(res => res.json()).then(data => { 
         setProyecto(data);
         const img = obtenerImagen(data);
         if(img) setImagenActual(img);
@@ -152,11 +152,11 @@ function VistaCliente() {
     cargarComentarios();
   }, [id]);
 
-  const cargarComentarios = () => { fetch(`http://localhost:5000/api/comentarios/${id}`).then(res => res.json()).then(data => { if(Array.isArray(data)) setComentarios(data.filter(c => c.tipo === 'cliente')); else setComentarios([]); }).catch(() => setComentarios([])); };
+  const cargarComentarios = () => { fetch(`https://portastudio-api.vercel.app/api/comentarios/${id}`).then(res => res.json()).then(data => { if(Array.isArray(data)) setComentarios(data.filter(c => c.tipo === 'cliente')); else setComentarios([]); }).catch(() => setComentarios([])); };
   
   const seleccionarVersion = async (archivo) => {
       if(!window.confirm(`¿Aprobar versión: "${archivo.nombre}"?`)) return;
-      const res = await fetch(`http://localhost:5000/api/proyectos/${id}/seleccionar`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urlArchivo: archivo.url, nombreArchivo: archivo.nombre }) });
+      const res = await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}/seleccionar`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ urlArchivo: archivo.url, nombreArchivo: archivo.nombre }) });
       const data = await res.json();
       setProyecto(data);
       alert("🎉 Versión aprobada.");
@@ -164,7 +164,7 @@ function VistaCliente() {
 
   const enviarDecision = async (d) => { 
       if(!window.confirm(`¿Confirmar decisión: ${d}?`)) return; 
-      const res = await fetch(`http://localhost:5000/api/proyectos/${id}/decision`, { 
+      const res = await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}/decision`, { 
           method: 'PUT', 
           headers: { 'Content-Type': 'application/json' }, 
           body: JSON.stringify({ decision: d }) 
@@ -175,8 +175,8 @@ function VistaCliente() {
       else alert(`Estado actualizado a: ${data.decision.toUpperCase()}`);
   };
 
-  const enviarReaccion = async (t) => { await fetch(`http://localhost:5000/api/proyectos/${id}/reaccion`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tipo: t }) }); const data = await (await fetch(`http://localhost:5000/api/proyectos/${id}`)).json(); setProyecto(data); };
-  const enviarComentarioCliente = async (e) => { e.preventDefault(); if (!nuevoComentario.trim()) return; await fetch('http://localhost:5000/api/comentarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proyectoId: id, usuario: nombreCliente || "Cliente", texto: nuevoComentario, tipo: 'cliente' }) }); setNuevoComentario(''); cargarComentarios(); };
+  const enviarReaccion = async (t) => { await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}/reaccion`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tipo: t }) }); const data = await (await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}`)).json(); setProyecto(data); };
+  const enviarComentarioCliente = async (e) => { e.preventDefault(); if (!nuevoComentario.trim()) return; await fetch('https://portastudio-api.vercel.app/api/comentarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proyectoId: id, usuario: nombreCliente || "Cliente", texto: nuevoComentario, tipo: 'cliente' }) }); setNuevoComentario(''); cargarComentarios(); };
 
   if (loading) return <div className="h-screen bg-neutral-950 flex items-center justify-center text-white/50 font-light">Cargando experiencia...</div>;
   if (!proyecto) return <div className="h-screen bg-neutral-950 flex items-center justify-center text-white">Proyecto no encontrado.</div>;
@@ -258,31 +258,31 @@ function PanelAdmin({ onLogout, usuario }) {
 
   const cargarDatos = async () => {
     try {
-      const resP = await fetch('http://localhost:5000/api/proyectos'); const dataP = await resP.json(); setProyectos(Array.isArray(dataP) ? dataP : []); 
-      const resC = await fetch('http://localhost:5000/api/clientes'); const dataC = await resC.json(); setClientes(Array.isArray(dataC) ? dataC : []);
-      const resR = await fetch('http://localhost:5000/api/recursos'); if(resR.ok) { const dataR = await resR.json(); setRecursos(Array.isArray(dataR) ? dataR : []); }
-      const resN = await fetch('http://localhost:5000/api/notificaciones'); if(resN.ok) { const dataN = await resN.json(); if(Array.isArray(dataN)){ setNotificaciones(dataN); setNoLeidas(dataN.filter(n => !n.leido).length); } }
+      const resP = await fetch('https://portastudio-api.vercel.app/api/proyectos'); const dataP = await resP.json(); setProyectos(Array.isArray(dataP) ? dataP : []); 
+      const resC = await fetch('https://portastudio-api.vercel.app/api/clientes'); const dataC = await resC.json(); setClientes(Array.isArray(dataC) ? dataC : []);
+      const resR = await fetch('https://portastudio-api.vercel.app/api/recursos'); if(resR.ok) { const dataR = await resR.json(); setRecursos(Array.isArray(dataR) ? dataR : []); }
+      const resN = await fetch('https://portastudio-api.vercel.app/api/notificaciones'); if(resN.ok) { const dataN = await resN.json(); if(Array.isArray(dataN)){ setNotificaciones(dataN); setNoLeidas(dataN.filter(n => !n.leido).length); } }
     } catch (error) { console.error("Error cargando datos:", error); }
   };
 
   useEffect(() => { cargarDatos(); const intervalo = setInterval(cargarDatos, 30000); return () => clearInterval(intervalo); }, []);
   useEffect(() => { if (proyectoSeleccionado) { const img = obtenerImagen(proyectoSeleccionado); setImagenVisualizada(img || ''); } else { setImagenVisualizada(''); } }, [proyectoSeleccionado]);
 
-  const abrirNotificacion = async (n) => { if(!n.leido) { await fetch(`http://localhost:5000/api/notificaciones/${n._id}/leer`, { method: 'PUT' }); const nuevas = notificaciones.map(item => item._id === n._id ? {...item, leido: true} : item); setNotificaciones(nuevas); setNoLeidas(nuevas.filter(x => !x.leido).length); } if(n.proyectoId) { const p = proyectos.find(x => x._id === n.proyectoId); if(p) { setProyectoSeleccionado(p); setTabChat('cliente'); cargarComentarios(p._id); } } setMostrarNotificaciones(false); };
-  const cargarComentarios = async (id) => { try { const res = await fetch(`http://localhost:5000/api/comentarios/${id}`); const data = await res.json(); setComentarios(Array.isArray(data) ? data : []); } catch { setComentarios([]); } };
-  const enviarComentario = async (e) => { e.preventDefault(); if (!nuevoComentario.trim()) return; await fetch('http://localhost:5000/api/comentarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proyectoId: proyectoSeleccionado._id, usuario: usuario?.nombre || "Colaborador", texto: nuevoComentario, tipo: tabChat }) }); setNuevoComentario(''); cargarComentarios(proyectoSeleccionado._id); };
-  const subirVersionRapida = async (e, id) => { const file = e.target.files[0]; if (!file) return; if(!window.confirm(`¿Subir archivo "${file.name}"?`)) return; const formData = new FormData(); formData.append('archivo', file); const res = await fetch(`http://localhost:5000/api/proyectos/${id}/version`, { method: 'POST', body: formData }); if(res.ok) { alert("✅ Nueva versión subida y notificación enviada."); cargarDatos(); if(proyectoSeleccionado && proyectoSeleccionado._id === id) { const updated = await (await fetch(`http://localhost:5000/api/proyectos/${id}`)).json(); setProyectoSeleccionado(updated); } } };
-  const enviarProyecto = async (e) => { e.preventDefault(); const formData = new FormData(); formData.append('titulo', nuevoProyecto.titulo); formData.append('cliente', nuevoProyecto.cliente); formData.append('estado', nuevoProyecto.estado); formData.append('descripcion', nuevoProyecto.descripcion); if (nuevoProyecto.fechaEntrega) formData.append('fechaEntrega', nuevoProyecto.fechaEntrega); if (archivo) formData.append('imagen', archivo); const res = await fetch('http://localhost:5000/api/proyectos', { method: 'POST', body: formData }); if (res.ok) { const data = await res.json(); setProyectos(prev => [data, ...prev]); setNuevoProyecto({ titulo: '', cliente: '', estado: 'Borrador', fechaEntrega: '', descripcion: '' }); setArchivo(null); alert("✅ Proyecto creado exitosamente"); } };
-  const enviarCliente = async (e) => { e.preventDefault(); const res = await fetch('http://localhost:5000/api/clientes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoCliente) }); if(res.ok) { const data = await res.json(); setClientes(prev => [data, ...prev]); setNuevoCliente({ nombre: '', email: '', empresa: '', telefono: '' }); } };
-  const subirRecurso = async (e) => { e.preventDefault(); if(!archivoRecurso) return alert("Selecciona archivo"); const formData = new FormData(); formData.append('nombre', nuevoRecurso.nombre); formData.append('categoria', nuevoRecurso.categoria); formData.append('archivo', archivoRecurso); const res = await fetch('http://localhost:5000/api/recursos', { method: 'POST', body: formData }); if(res.ok) { const data = await res.json(); setRecursos(prev => [data, ...prev]); setNuevoRecurso({ nombre: '', categoria: 'Otros' }); setArchivoRecurso(null); alert("✅ Recurso subido"); } };
-  const eliminarProyecto = async (id, e) => { e.stopPropagation(); if (window.confirm("¿Eliminar proyecto?")) { await fetch(`http://localhost:5000/api/proyectos/${id}`, { method: 'DELETE' }); cargarDatos(); } };
-  const eliminarRecurso = async (id) => { if(window.confirm("¿Eliminar recurso?")) { await fetch(`http://localhost:5000/api/recursos/${id}`, { method: 'DELETE' }); cargarDatos(); } };
+  const abrirNotificacion = async (n) => { if(!n.leido) { await fetch(`https://portastudio-api.vercel.app/api/notificaciones/${n._id}/leer`, { method: 'PUT' }); const nuevas = notificaciones.map(item => item._id === n._id ? {...item, leido: true} : item); setNotificaciones(nuevas); setNoLeidas(nuevas.filter(x => !x.leido).length); } if(n.proyectoId) { const p = proyectos.find(x => x._id === n.proyectoId); if(p) { setProyectoSeleccionado(p); setTabChat('cliente'); cargarComentarios(p._id); } } setMostrarNotificaciones(false); };
+  const cargarComentarios = async (id) => { try { const res = await fetch(`https://portastudio-api.vercel.app/api/comentarios/${id}`); const data = await res.json(); setComentarios(Array.isArray(data) ? data : []); } catch { setComentarios([]); } };
+  const enviarComentario = async (e) => { e.preventDefault(); if (!nuevoComentario.trim()) return; await fetch('https://portastudio-api.vercel.app/api/comentarios', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proyectoId: proyectoSeleccionado._id, usuario: usuario?.nombre || "Colaborador", texto: nuevoComentario, tipo: tabChat }) }); setNuevoComentario(''); cargarComentarios(proyectoSeleccionado._id); };
+  const subirVersionRapida = async (e, id) => { const file = e.target.files[0]; if (!file) return; if(!window.confirm(`¿Subir archivo "${file.name}"?`)) return; const formData = new FormData(); formData.append('archivo', file); const res = await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}/version`, { method: 'POST', body: formData }); if(res.ok) { alert("✅ Nueva versión subida y notificación enviada."); cargarDatos(); if(proyectoSeleccionado && proyectoSeleccionado._id === id) { const updated = await (await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}`)).json(); setProyectoSeleccionado(updated); } } };
+  const enviarProyecto = async (e) => { e.preventDefault(); const formData = new FormData(); formData.append('titulo', nuevoProyecto.titulo); formData.append('cliente', nuevoProyecto.cliente); formData.append('estado', nuevoProyecto.estado); formData.append('descripcion', nuevoProyecto.descripcion); if (nuevoProyecto.fechaEntrega) formData.append('fechaEntrega', nuevoProyecto.fechaEntrega); if (archivo) formData.append('imagen', archivo); const res = await fetch('https://portastudio-api.vercel.app/api/proyectos', { method: 'POST', body: formData }); if (res.ok) { const data = await res.json(); setProyectos(prev => [data, ...prev]); setNuevoProyecto({ titulo: '', cliente: '', estado: 'Borrador', fechaEntrega: '', descripcion: '' }); setArchivo(null); alert("✅ Proyecto creado exitosamente"); } };
+  const enviarCliente = async (e) => { e.preventDefault(); const res = await fetch('https://portastudio-api.vercel.app/api/clientes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoCliente) }); if(res.ok) { const data = await res.json(); setClientes(prev => [data, ...prev]); setNuevoCliente({ nombre: '', email: '', empresa: '', telefono: '' }); } };
+  const subirRecurso = async (e) => { e.preventDefault(); if(!archivoRecurso) return alert("Selecciona archivo"); const formData = new FormData(); formData.append('nombre', nuevoRecurso.nombre); formData.append('categoria', nuevoRecurso.categoria); formData.append('archivo', archivoRecurso); const res = await fetch('https://portastudio-api.vercel.app/api/recursos', { method: 'POST', body: formData }); if(res.ok) { const data = await res.json(); setRecursos(prev => [data, ...prev]); setNuevoRecurso({ nombre: '', categoria: 'Otros' }); setArchivoRecurso(null); alert("✅ Recurso subido"); } };
+  const eliminarProyecto = async (id, e) => { e.stopPropagation(); if (window.confirm("¿Eliminar proyecto?")) { await fetch(`https://portastudio-api.vercel.app/api/proyectos/${id}`, { method: 'DELETE' }); cargarDatos(); } };
+  const eliminarRecurso = async (id) => { if(window.confirm("¿Eliminar recurso?")) { await fetch(`https://portastudio-api.vercel.app/api/recursos/${id}`, { method: 'DELETE' }); cargarDatos(); } };
   
   // === NUEVA FUNCIÓN PARA ELIMINAR CLIENTES ===
   const eliminarCliente = async (id) => {
       if(!window.confirm("¿Seguro que quieres eliminar este cliente? Se borrarán sus datos.")) return;
       try {
-          await fetch(`http://localhost:5000/api/clientes/${id}`, { method: 'DELETE' });
+          await fetch(`https://portastudio-api.vercel.app/api/clientes/${id}`, { method: 'DELETE' });
           alert("✅ Cliente eliminado");
           cargarDatos(); // Recargar la lista
       } catch (e) { alert("Error al eliminar"); }
